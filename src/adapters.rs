@@ -22,7 +22,8 @@ impl Adapter {
             "rs" => Some(Self::Rust),
             "ts" | "mts" | "cts" => Some(Self::TypeScript),
             "tsx" => Some(Self::Tsx),
-            "js" | "mjs" | "cjs" | "jsx" => Some(Self::JavaScript),
+            "js" | "mjs" | "cjs" => Some(Self::JavaScript),
+            "jsx" => Some(Self::Tsx),
             "py" => Some(Self::Python),
             "go" => Some(Self::Go),
             _ => None,
@@ -112,13 +113,14 @@ fn visit_declarations(
     out: &mut Vec<ParsedSymbol>,
 ) {
     let kind = node.kind();
-    let parsed_kind = if adapter.function_kinds().contains(&kind) {
-        Some(ParsedKind::Function)
-    } else if adapter.type_kinds().contains(&kind) {
-        Some(ParsedKind::Type)
-    } else {
-        None
-    };
+    let parsed_kind =
+        if adapter.function_kinds().contains(&kind) || is_function_variable(node, adapter) {
+            Some(ParsedKind::Function)
+        } else if adapter.type_kinds().contains(&kind) {
+            Some(ParsedKind::Type)
+        } else {
+            None
+        };
 
     if let Some(parsed_kind) = parsed_kind {
         if let Some(name) = declaration_name(node, source) {
@@ -154,6 +156,18 @@ fn visit_declarations(
     for child in node.children(&mut cursor) {
         visit_declarations(child, adapter, source, rel_path, abs_path, out);
     }
+}
+
+fn is_function_variable(node: Node<'_>, adapter: Adapter) -> bool {
+    if !matches!(
+        adapter,
+        Adapter::TypeScript | Adapter::Tsx | Adapter::JavaScript
+    ) || node.kind() != "variable_declarator"
+    {
+        return false;
+    }
+    node.child_by_field_name("value")
+        .is_some_and(|value| matches!(value.kind(), "arrow_function" | "function_expression"))
 }
 
 fn declaration_name(node: Node<'_>, source: &str) -> Option<String> {
@@ -203,7 +217,7 @@ fn collect_evidence(
     if matches!(
         node.kind(),
         "type_identifier" | "generic_type" | "scoped_type_identifier"
-    ) && node.start_position().row + 1 <= declaration_line + 8
+    ) && node.start_position().row < declaration_line + 8
     {
         if let Some(name) = final_identifier(node, source) {
             if !is_primitive(&name) {
@@ -250,35 +264,34 @@ fn source_excerpt(source: &str, start: usize, end: usize) -> String {
 
 fn boundary_for(name: &str) -> Option<String> {
     let lower = name.to_ascii_lowercase();
-    let (label, needles): (&str, &[&str]) = if ["fetch", "request", "send", "recv", "connect"]
+    let label = if ["fetch", "request", "send", "recv", "connect"]
         .iter()
         .any(|part| lower.contains(part))
     {
-        ("network I/O", &[])
+        "network I/O"
     } else if ["read", "write", "open", "file", "mkdir"]
         .iter()
         .any(|part| lower.contains(part))
     {
-        ("filesystem I/O", &[])
+        "filesystem I/O"
     } else if ["query", "execute", "insert", "update", "transaction"]
         .iter()
         .any(|part| lower.contains(part))
     {
-        ("database I/O", &[])
+        "database I/O"
     } else if ["serialize", "deserialize", "parse", "decode", "encode"]
         .iter()
         .any(|part| lower.contains(part))
     {
-        ("serialization", &[])
+        "serialization"
     } else if ["getenv", "var", "environment"]
         .iter()
         .any(|part| lower.contains(part))
     {
-        ("process environment", &[])
+        "process environment"
     } else {
         return None;
     };
-    let _ = needles;
     Some(label.to_string())
 }
 
@@ -336,5 +349,34 @@ fn validate(order: Order) {}
                 .any(|c| c.boundary.as_deref() == Some("database I/O"))
         );
         assert!(handle.type_names.contains(&"Order".to_string()));
+    }
+
+    #[test]
+    fn polyglot_adapters_find_documented_declarations() {
+        let cases = [
+            (
+                Adapter::TypeScript,
+                "type Order = { id: number };\nconst handle = (order: Order) => validate(order);\nfunction validate(order: Order) {}\n",
+                "handle",
+            ),
+            (
+                Adapter::Python,
+                "class Order:\n    pass\n\ndef handle(order: Order):\n    validate(order)\n",
+                "handle",
+            ),
+            (
+                Adapter::Go,
+                "package shop\ntype Order struct { ID int }\nfunc handle(order Order) { validate(order) }\n",
+                "handle",
+            ),
+        ];
+        for (adapter, source, expected) in cases {
+            let symbols = parse_file(adapter, source, "fixture", "/fixture").unwrap();
+            assert!(
+                symbols.iter().any(|symbol| symbol.name == expected),
+                "{} adapter missed {expected}",
+                adapter.label()
+            );
+        }
     }
 }

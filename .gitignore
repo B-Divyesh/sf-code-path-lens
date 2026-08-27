@@ -3,4 +3,10 @@ dist/
 .env
 *.log
 graphify-out/
+.factory/evidence/
+/target/
+*-lens.html
+*-lens.json
+*-lens.dot
 .DS_Store
+npm-debug.log*

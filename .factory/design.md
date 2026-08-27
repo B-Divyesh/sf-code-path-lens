@@ -51,9 +51,10 @@ Controls resemble small field labels: square corners softened by 2 px, a clear
 2 px ink rule, and a 3 px offset shadow that collapses on press. Graph nodes are
 not generic cards: they are numbered evidence slips joined by typed map lines.
 Keyboard focus is a 3 px ochre ring with 3 px breathing room. Every control is
-at least 44 px high. On a 390 px screen, the scenery is cropped, the proof strip
-stacks, and the demo becomes a horizontally scrollable map with a textual edge
-list immediately below it.
+at least 44 px high. On a 390 px screen, the decorative scenery is dropped to
+protect first paint and reading space, the proof strip stacks, and the demo
+becomes a horizontally scrollable map with a textual edge list immediately
+below it.
 
 ## Motion
 

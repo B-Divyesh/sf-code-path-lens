@@ -1,0 +1,19 @@
+{
+  "name": "code-path-lens-workspace",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --config site/vite.config.js",
+    "test": "cargo test && npm run build:site && node site/test.mjs",
+    "test:a11y": "node scripts/check-a11y.mjs",
+    "build:site": "vite build --config site/vite.config.js",
+    "build:cli": "cargo build --release && node scripts/copy-binary.mjs",
+    "build": "npm run build:cli && npm run build:site"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "playwright": "^1.62.1",
+    "vite": "^7.1.3"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "slug": "code-path-lens",
+  "title": "Code Path Lens",
+  "territory": "devtools-data",
+  "user": "Developers reviewing an unfamiliar code path who need a small, deterministic view of the relevant callers, callees, types, and data boundaries instead of navigating an entire repository.",
+  "smallest_useful_product": "An LSP/tree-sitter CLI and static viewer that starts at a symbol, follows a bounded call/type/data path, and emits a source-linked graph with explicit unresolved edges. Non-goals: code generation, cloud indexing, or natural-language answers.",
+  "success_measure": "In user tests, developers locate a relevant implementation path in an unfamiliar repository 30% faster than with editor search alone.",
+  "artifact_class": "cli",
+  "monetization": "one-time",
+  "constraints": "Respect .gitignore and generated-code exclusions; use language adapters with clear fallbacks; static approximation must never claim runtime completeness.",
+  "confidence": 4,
+  "state": "RESEARCHED"
+}

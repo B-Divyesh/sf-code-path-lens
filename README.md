@@ -77,6 +77,9 @@ npm run build:site       # landing/docs site -> dist/site/
 cargo package --allow-dirty
 ```
 
+With `npm run dev` running, `npm run test:a11y` checks both 1366 px and 390 px
+viewports with Playwright + axe. Set `LENS_TEST_URL` to check another server.
+
 `npm run dev` serves the site. The package contains no telemetry, runtime CDN,
 or cloud indexer. `.gitignore` and common generated/vendor directories are
 respected by default.

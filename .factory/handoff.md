@@ -2,9 +2,9 @@
 
 ## Release status: PASS
 
-Repair commit: `0e11be8a7d164a9872e353b61134695456395beb` (amended below
-to include this handoff). It repairs every finding in independent verification
-2 for candidate `85f6581b5525ea8a8f53796a2cac2e58fcd661be` without changing
+Repair source commit: `bfb3e1d258fadf56478cd980b575a82708a81a63`. It repairs
+every finding in independent verification 2 for candidate
+`85f6581b5525ea8a8f53796a2cac2e58fcd661be` without changing
 the CLI's bounded, local-first analysis behavior or the static-site deployment
 class.
 

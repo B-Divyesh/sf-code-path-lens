@@ -2,7 +2,10 @@ use anyhow::{Context, Result, bail};
 use serde::Deserialize;
 
 const PRODUCT_SLUG: &str = "code-path-lens";
-const DEFAULT_BILLING_BASE: &str = "https://pilot-api.sociobot.in/api/v1";
+/// The released product always verifies against Sociobot's production billing
+/// service. Staging and local integration tests can use the explicit
+/// `CODE_PATH_LENS_BILLING_BASE` override instead.
+const DEFAULT_BILLING_BASE: &str = "https://api.sociobot.in/api/v1";
 
 #[derive(Deserialize)]
 struct VerifyResponse {
@@ -39,4 +42,15 @@ pub fn require_pro(explicit_token: Option<&str>) -> Result<()> {
         bail!("license is not active ({})", verdict.reason);
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::DEFAULT_BILLING_BASE;
+
+    #[test]
+    fn released_cli_defaults_to_the_production_billing_service() {
+        assert_eq!(DEFAULT_BILLING_BASE, "https://api.sociobot.in/api/v1");
+        assert!(!DEFAULT_BILLING_BASE.contains("pilot-api"));
+    }
 }

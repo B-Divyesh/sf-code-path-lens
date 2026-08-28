@@ -4,6 +4,7 @@ import { resolve, dirname } from 'node:path';
 import { readFileSync } from 'node:fs';
 
 const root = dirname(fileURLToPath(import.meta.url));
+const BILLING_BASE = 'https://api.sociobot.in/api/v1';
 
 export default defineConfig({
   root,
@@ -13,7 +14,9 @@ export default defineConfig({
       order: 'pre',
       handler(html) {
         const css = readFileSync(resolve(root, 'styles.css'), 'utf8');
-        return html.replace('<link rel="stylesheet" href="/styles.css">', `<style>${css}</style>`);
+        return html
+          .replace('<link rel="stylesheet" href="/styles.css">', `<style>${css}</style>`)
+          .replaceAll('__CODE_PATH_LENS_BILLING_BASE__', BILLING_BASE);
       }
     }
   }],
@@ -29,5 +32,8 @@ export default defineConfig({
         terms: resolve(root, 'terms/index.html')
       }
     }
+  },
+  define: {
+    __CODE_PATH_LENS_BILLING_BASE__: JSON.stringify(BILLING_BASE)
   }
 });

@@ -86,7 +86,10 @@ copyButton?.addEventListener('click', async () => {
 
 const LICENSE_KEY = 'sb_license:code-path-lens';
 const VERDICT_KEY = `${LICENSE_KEY}:verdict`;
-const API = 'https://pilot-api.sociobot.in/api/v1';
+// Replaced by Vite as a string at build time. Keeping the released endpoint in
+// the build config makes the checkout link and token verification use one
+// audited production source of truth.
+const API = __CODE_PATH_LENS_BILLING_BASE__;
 const licenseNote = document.querySelector('#license-note');
 const tokenInput = document.querySelector('#license-token');
 

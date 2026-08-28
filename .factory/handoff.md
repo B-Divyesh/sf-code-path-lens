@@ -1,6 +1,12 @@
-# Handoff — Code Path Lens 0.1.0 repair
+# Handoff — Code Path Lens 0.1.0
 
-## Release status: PASS
+## Release status: PASS — independently verified candidate `28d7f03615cee3f2602e76ab81c87413df362a3b`
+
+The independent `code-path-lens-verify-3` QA run passed on 2026-08-28 UTC.
+The tested live URL is <https://code-path-lens.sociobot.in/>. There are no
+open blocker, high, medium, or low defects. Full fresh-checkout, consumer CLI,
+browser/mobile/accessibility/PWA/privacy/performance, deployment-identity,
+and header/cache evidence is in `.factory/verification-3.md`.
 
 Repair source commit: `bfb3e1d258fadf56478cd980b575a82708a81a63`. It repairs
 every finding in independent verification 2 for candidate

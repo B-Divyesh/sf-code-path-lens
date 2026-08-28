@@ -2,20 +2,25 @@
 
 ## Independent verification status: FAIL
 
-Candidate `85f6581b5525ea8a8f53796a2cac2e58fcd661be` is locally buildable and
-the CLI/site checks pass, but **must not be released**. On 2026-08-27 the
-required public URL `https://code-path-lens.sociobot.in/` failed TLS hostname
-validation. Its Azure certificate has no `code-path-lens.sociobot.in` SAN, and
-diagnostic-only `curl -k` returned `404 Site Not Found`. The live deployment
-therefore cannot be matched to this candidate or used by a normal visitor.
+Fresh verification on 2026-08-28 tested candidate
+`85f6581b5525ea8a8f53796a2cac2e58fcd661be` against
+`https://code-path-lens.sociobot.in/`.
 
-The other high-severity release issue is that the current source hard-codes
-`https://pilot-api.sociobot.in/api/v1` in both the site and paid CLI path.
-There is no repository build configuration that switches it to the required
-production Sociobot API.
+The earlier deployment-only failure is resolved: normal HTTPS validates and
+the live HTML and hashed JavaScript are byte-for-byte identical to the exact
+candidate production build. Local tests, Clippy, package verification, clean
+consumer install, CLI flows, desktop/mobile browser checks, axe, focus,
+reduced motion, generated viewer, and offline reload all passed.
 
-Full exact evidence, commands, accessibility/mobile/offline results, package
-consumer exercise, and next steps are in `.factory/verification.md`.
+**Do not release yet.** The public site sends checkout and license verification
+to `https://pilot-api.sociobot.in/api/v1`, not the required production
+`https://api.sociobot.in/api/v1`. This is a HIGH release blocker for a paid
+production product. The live deployment also caches hashed assets for only 30
+seconds (MEDIUM) and lacks CSP/framing/permissions policy hardening (LOW).
+
+Complete exact evidence, commands, test outcomes, deployment hashes, and
+required fixes are in `.factory/verification-2.md`. The earlier report remains
+in `.factory/verification.md` for historical context.
 
 ## How to build and verify locally
 
@@ -29,14 +34,14 @@ cargo package --allow-dirty
 ```
 
 `npm run build` writes the release binary to `dist/bin/code-path-lens` and the
-deployable static site to `dist/site/`. The Rust package was successfully
-verified by `cargo package --allow-dirty`; do not publish it from this worker.
+deployable static site to `dist/site/`. The ready-to-publish Rust package was
+verified with `cargo package --allow-dirty`; do not publish it from this worker.
 
 ## Required release steps
 
-1. Correct TLS/DNS and deploy the exact `dist/site/` artifact so verified HTTPS
-   returns Code Path Lens at the public URL.
-2. Configure the released site and CLI for `https://api.sociobot.in/api/v1`;
-   verify the token-only paid-license flow.
-3. Add/verify production cache and security response policy, then repeat live
-   URL, header, browser, and Lighthouse checks.
+1. Build/deploy the public site with the production Sociobot API base and
+   repeat the token-only live license check.
+2. Apply immutable cache policy to hashed JS/image assets while keeping HTML
+   and `sw.js` updateable.
+3. Apply CSP/framing/permissions response policy and rerun live header/cache
+   and Lighthouse verification.

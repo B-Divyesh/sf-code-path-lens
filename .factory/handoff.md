@@ -1,8 +1,48 @@
 # Handoff — Code Path Lens 0.1.0
 
-## Release status: PASS — independently verified candidate `28d7f03615cee3f2602e76ab81c87413df362a3b`
+## Review 1 status: FAIL on 2026-09-05
 
-The independent `code-path-lens-verify-3` QA run passed on 2026-08-28 UTC.
+Independent work order `code-path-lens-review-1` found **7 findings** and **28
+untested public claim families**. The product must not be declared accepted.
+The full evidence and required repairs are in `.factory/review-1.md`.
+
+The free CLI, generated viewer, live accessibility checks, offline reload,
+security headers, asset budgets, and Lighthouse checks pass. Release is blocked
+by three high-severity issues: the public Pro checkout returns an unexpected
+404, the required site/CLI sample mode is absent, and `.factory/claims.json`
+with tagged claim tests is absent. The review also records plain-word, 404,
+metadata/site-skeleton, and touch-target findings.
+
+Implementation reviewed: `bfb3e1d258fadf56478cd980b575a82708a81a63`.
+Documentation baseline reviewed: `f801a5aa4703d3f20f0eae4e19bc0ac7bfe1cc71`.
+No product code or deployment was changed by the review.
+
+### Review verification
+
+From a clean clone, `npm ci`, `npm test`, `npm run build`,
+`cargo package --allow-dirty`, strict Clippy, and `npm audit --audit-level=high`
+passed. The packaged CLI was installed into a clean consumer prefix and its
+normal, invalid, boundary, recovery, JSON, HTML, keyboard, mobile, and reduced
+motion paths were exercised. The live site was checked at 1366×900 and 390×844;
+axe found no violations. Lighthouse reported Performance 100, Accessibility
+100, Best Practices 100, SEO 100, and LCP 1.3 s.
+
+### Required next work
+
+1. Enable and verify the production Sociobot checkout and valid paid unlock.
+2. Add the bundled CLI demo, real `/demo` sample state, persistent sample label,
+   reset/exit controls, terminal recording, examples, and `.factory/demo.md`.
+3. Add `.factory/claims.json` and one tagged clean-sandbox test for every
+   retained public claim.
+4. Repair the first-screen words, 404 behavior, metadata/shared skeleton, and
+   small touch targets.
+
+---
+
+## Prior verification status (superseded): PASS for candidate `28d7f03615cee3f2602e76ab81c87413df362a3b`
+
+The independent `code-path-lens-verify-3` QA run passed under its
+2026-08-28 contract. Review 1 above supersedes its release decision.
 The tested live URL is <https://code-path-lens.sociobot.in/>. There are no
 open blocker, high, medium, or low defects. Full fresh-checkout, consumer CLI,
 browser/mobile/accessibility/PWA/privacy/performance, deployment-identity,

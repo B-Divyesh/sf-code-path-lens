@@ -1,163 +1,132 @@
-# Handoff — Code Path Lens 0.1.0
+# Handoff — Code Path Lens 0.1.0 repair 2
 
-## Review 1 status: FAIL on 2026-09-05
+## Status
 
-Independent work order `code-path-lens-review-1` found **7 findings** and **28
-untested public claim families**. The product must not be declared accepted.
-The full evidence and required repairs are in `.factory/review-1.md`.
+Implementation candidate: `378180b12c9745185b1adad6f081d05a4cc31bff`.
 
-The free CLI, generated viewer, live accessibility checks, offline reload,
-security headers, asset budgets, and Lighthouse checks pass. Release is blocked
-by three high-severity issues: the public Pro checkout returns an unexpected
-404, the required site/CLI sample mode is absent, and `.factory/claims.json`
-with tagged claim tests is absent. The review also records plain-word, 404,
-metadata/site-skeleton, and touch-target findings.
+This repair resolves the product-controlled sample, claims, copy, route,
+metadata, shared-skeleton, touch-target, and 404 findings from review 1. It is
+deployed at <https://code-path-lens.sociobot.in>. The factory billing product
+is still not enabled at the external Sociobot billing service. The site no
+longer shows the broken checkout or an unavailable paid offer. That external
+registration remains the only known dependency before a paid tier can return.
 
-Implementation reviewed: `bfb3e1d258fadf56478cd980b575a82708a81a63`.
-Documentation baseline reviewed: `f801a5aa4703d3f20f0eae4e19bc0ac7bfe1cc71`.
-No product code or deployment was changed by the review.
+The current report/handoff is committed after the implementation candidate;
+use `git log -- .factory/handoff.md` to identify its separate documentation
+commit SHA.
 
-### Review verification
+## What changed
 
-From a clean clone, `npm ci`, `npm test`, `npm run build`,
-`cargo package --allow-dirty`, strict Clippy, and `npm audit --audit-level=high`
-passed. The packaged CLI was installed into a clean consumer prefix and its
-normal, invalid, boundary, recovery, JSON, HTML, keyboard, mobile, and reduced
-motion paths were exercised. The live site was checked at 1366×900 and 390×844;
-axe found no violations. Lighthouse reported Performance 100, Accessibility
-100, Best Practices 100, SEO 100, and LCP 1.3 s.
+- Added `code-path-lens demo`, which materializes the checked-in
+  `examples/checkout-sample/` repository in a temporary directory, runs the
+  real analyzer, writes a populated review page, and reports its location.
+- Added `/demo/` with a real populated sample, source-line links, persistent
+  **“Demo — sample data, nothing is saved”** banner, **Reset demo**, and
+  **Start for real**. It uses only `demo:code-path-lens:session`; real browser
+  data is neither read nor written in demo mode.
+- Added `.factory/demo.md`, `.factory/claims.json`, 16 isolated claim checks,
+  and a test runner that accepts every documented `npm test -- --grep
+  @claim:<id>` command.
+- Rewrote the first screen in plain words: job, audience, and one-click sample
+  action are visible before scrolling. Added the copy and terminology audit.
+- Added consistent headers and footers, route titles, canonical/OG/Twitter
+  metadata, a product-derived 1200×630 social card, 180 px touch icon, demo
+  sitemap entry, terminal recording, and 44 px target areas.
+- Added a designed `404.html`; unknown paths now return an HTTP 404 with that
+  page. Removed the multipage site's landing-page fallback.
+- Kept the existing local-first analyzer and free outputs. The viewer,
+  `.gitignore` handling, generated/vendor exclusions, output formats, explicit
+  bounds, and static-approximation notice remain intact.
 
-### Required next work
+## Verification
 
-1. Enable and verify the production Sociobot checkout and valid paid unlock.
-2. Add the bundled CLI demo, real `/demo` sample state, persistent sample label,
-   reset/exit controls, terminal recording, examples, and `.factory/demo.md`.
-3. Add `.factory/claims.json` and one tagged clean-sandbox test for every
-   retained public claim.
-4. Repair the first-screen words, 404 behavior, metadata/shared skeleton, and
-   small touch targets.
-
----
-
-## Prior verification status (superseded): PASS for candidate `28d7f03615cee3f2602e76ab81c87413df362a3b`
-
-The independent `code-path-lens-verify-3` QA run passed under its
-2026-08-28 contract. Review 1 above supersedes its release decision.
-The tested live URL is <https://code-path-lens.sociobot.in/>. There are no
-open blocker, high, medium, or low defects. Full fresh-checkout, consumer CLI,
-browser/mobile/accessibility/PWA/privacy/performance, deployment-identity,
-and header/cache evidence is in `.factory/verification-3.md`.
-
-Repair source commit: `bfb3e1d258fadf56478cd980b575a82708a81a63`. It repairs
-every finding in independent verification 2 for candidate
-`85f6581b5525ea8a8f53796a2cac2e58fcd661be` without changing
-the CLI's bounded, local-first analysis behavior or the static-site deployment
-class.
-
-## Repairs
-
-1. The released website checkout and browser token verification now use
-   `https://api.sociobot.in/api/v1`, and the CLI's default verification base is
-   the same production endpoint. The CLI's explicit
-   `CODE_PATH_LENS_BILLING_BASE` override remains available for isolated
-   staging/integration testing.
-2. `site/public/staticwebapp.config.json` is deployed with the static site.
-   It keeps HTML short-lived, makes `/assets/*` immutable for one year, and
-   keeps `/sw.js` updateable with `no-cache`.
-3. The same deployment config adds a restrictive CSP (only self and the
-   production billing API for connections), `X-Frame-Options: DENY`,
-   `Permissions-Policy`, COOP, CORP, nosniff, and referrer policy.
-4. Regression coverage now rejects a release artifact that ships a pilot API
-   URL, lacks either production paid endpoint, ships an unresolved endpoint
-   placeholder, lacks the CSP/frame policy, or loses immutable asset caching.
-   A Rust unit test locks the CLI default to the production service. Playwright
-   was pinned to the installed `1.58.2` browser revision for repeatable browser
-   checks.
-
-## Verification performed (2026-08-28 UTC)
-
-Fresh install and local quality gates all passed:
+From the documented setup, the following passed on 2026-09-05 UTC:
 
 ```sh
 npm ci
-cargo test
-cargo clippy --all-targets --all-features -- -D warnings
 npm test
 npm run build
+cargo clippy --all-targets --all-features -- -D warnings
 cargo package --allow-dirty
 npm audit --audit-level=high
 ```
 
-- `npm ci`: 0 vulnerabilities.
-- `cargo test`: 7 unit tests and 1 documented CLI integration test passed.
-- `npm test`: includes the release-artifact endpoint/header/cache regression
-  assertions; passed. `npm run build` produced `dist/bin/code-path-lens` and
-  `dist/site/`.
-- `cargo package --allow-dirty`: package verification passed (20 files,
-  124.5 KiB unpacked / 35.3 KiB compressed).
-- A clean temporary consumer installed only
-  `target/package/code-path-lens-0.1.0` with `cargo install --path ...`; its
-  `--version`, `--help`, and `languages` public surface passed.
-- The release site bundle is 6,346 bytes (2,680 bytes gzip), the generated
-  WebP hero is 75,322 bytes, and no webfont files ship.
+- `npm test` ran 7 Rust unit tests, 2 CLI integration tests, static-site
+  checks, and all 16 declared claim commands. Each claim starts from the
+  shipped sample or a fresh browser/temporary repository. Browser claims use
+  a dedicated context for offline reloads.
+- `cargo package --allow-dirty` verified 26 package files (142.9 KiB unpacked,
+  40.1 KiB compressed). A clean consumer install from
+  `target/package/code-path-lens-0.1.0` ran `--version`, `languages`, and
+  `demo --output`; it wrote a populated HTML review page.
+- `npm run build` produced `dist/bin/code-path-lens` and `dist/site/`. Initial
+  JavaScript is 6.07 KB (2.03 KB gzip); the hero is 75.3 KB; no webfonts ship.
+- `/opt/fleet/lib/verify-url.sh` passed against the public URL: title, language,
+  h1, main landmark, image alt text, and console checks all passed.
+- `LENS_TEST_URL=https://code-path-lens.sociobot.in npm run test:a11y` found
+  zero axe violations for `/`, `/demo/`, `/privacy/`, `/terms/`, and `/404.html`
+  at 1366×900 and 390×844.
+- Live Lighthouse (Chromium with `--disable-dev-shm-usage --disable-gpu`) scored
+  Performance 100, Accessibility 100, Best Practices 100, and SEO 100. FCP
+  was 0.9 s, LCP 1.2 s, and CLS 0.
 
-Browser checks used Chromium/Playwright 1.58.2 at 1366×900 and 390×844:
+## Live deployment evidence
 
-- `LENS_TEST_URL=http://127.0.0.1:4173 npm run test:a11y`: 0 axe findings at
-  both sizes.
-- The local production artifact accepted an isolated `qa-invalid-token`,
-  removed `?license=` from the URL, requested only the production verify URL,
-  displayed its existing invalid-license recovery state, and had no console or
-  page errors. Filter empty/recovery, `/`, Escape, arrow-node navigation, and
-  no horizontal overflow passed at both widths.
-- A service-worker-controlled local reload then an offline reload retained the
-  application title without page errors. The worker's existing
-  `skipWaiting`/`clients.claim` update flow is retained; deployed `sw.js` is
-  explicitly `Cache-Control: no-cache`.
-- A fresh normal live load made requests only to
-  `https://code-path-lens.sociobot.in` (no analytics, CDN, source upload, or
-  other third party). Live paid-flow/keyboard/overflow/console checks passed at
-  both sizes with the same isolated invalid token.
+`/opt/fleet/lib/deploy-static.sh code-path-lens dist/site` completed on
+2026-09-05 UTC. The live root and hashed application asset match this
+implementation byte-for-byte:
 
-Deployment and public identity were verified after:
+| Artifact | SHA-256 |
+| --- | --- |
+| `index.html` | `be03305eefe18566cff3d536f6294267d0b8debaf854628f8798f68c4e9ea413` |
+| `assets/app-bH3Yy194.js` | `54ef2a834122058879d123deafd3e922389187afbe6038395c957603c1723cdc` |
 
-```sh
-/opt/fleet/lib/deploy-static.sh code-path-lens dist/site
-```
+Live HTML is short-lived; hashed assets are `public, max-age=31536000,
+immutable`; `sw.js` is `no-cache`. CSP limits connections to the same origin;
+frame denial, nosniff, strict referrer policy, COOP, CORP, and permissions
+policy are live.
 
-- `https://code-path-lens.sociobot.in/` returned normal TLS/HTTP 200. The live
-  HTML SHA-256 is
-  `c9b131d3b3a4520d603085e81b264287c5754acfb0ac535840693047f7de1ab9`,
-  exactly matching `dist/site/index.html`.
-- The live hashed asset `/assets/index-DNl_AHsP.js` SHA-256 is
-  `167d03bbf27426dd81a6dc7ca815caeb86e359356b71d8f441e393ccf41ec63f`,
-  exactly matching the build. Its response is
-  `Cache-Control: public, max-age=31536000, immutable`; HTML is
-  `public, max-age=0, must-revalidate`; `/sw.js` is `no-cache`.
-- Live responses include the configured CSP, `X-Frame-Options: DENY`,
-  `Permissions-Policy`, COOP, CORP, `Referrer-Policy`, and nosniff.
-- `LENS_TEST_URL=https://code-path-lens.sociobot.in npm run test:a11y`: 0 axe
-  findings at both target sizes.
-- Lighthouse 12.8.2 against the live site (mobile default) reported
-  Performance **100**, Accessibility **100**, FCP **0.9 s**, LCP **1.2 s**,
-  and CLS **0**.
+Fresh live desktop and phone browser contexts confirmed before scrolling:
 
-## Build, run, deploy, publish
+- **Job:** trace a bounded path around a code symbol.
+- **Audience:** developers reviewing unfamiliar code.
+- **First action:** Try it with sample data.
 
-```sh
-npm ci
-npm test
-npm run build
-cargo package --allow-dirty
-```
+Both contexts clicked that action, saw the persistent sample banner, selected
+`validate`, reset to `handle_order`, retained a seeded real-data key unchanged,
+and made no third-party requests or console/page errors. **Start for real**
+removed the demo marker while retaining that real-data key. The visible touch
+targets measured at least 44 px. A service-worker-controlled live `/demo/`
+reload also succeeded while offline, with the demo title and h1 intact.
 
-The deployable static output is `dist/site/`; the release CLI is
-`dist/bin/code-path-lens`. The factory owns registry credentials: do not
-publish from this worker. The ready-to-publish check is
-`cargo package --allow-dirty`.
+Unknown `/no-such-page` returns HTTP 404 with title **“Page not found — Code
+Path Lens”** and a home link. Chromium records the expected failed navigation
+resource for that deliberate 404; it is not a page error or broken route.
 
-## Known gaps
+Evidence files are under `/work/.evidence/`, including `cpl-live-verify/`,
+desktop/phone first-screen and demo screenshots, and
+`cpl-live-lighthouse-retry.json`.
 
-None. The production site is deployed and the repair's live identity, paid
-flow routing, cache/security policy, browser, accessibility, privacy, offline,
-package, and performance checks passed.
+## Review-history disposition
+
+| Earlier finding | Current disposition |
+| --- | --- |
+| Broken TLS/live deployment | Resolved by the existing static app; current deployment returns valid HTTPS 200 and matching artifacts. |
+| Pilot billing base and weak cache/security headers | Site paid UI was removed until the billing product exists. Static cache and security headers remain live and verified. The CLI retains its production verification default for a future enabled license. |
+| Missing CLI/site sample mode | Resolved by the bundled CLI sample, `/demo/`, sample label, reset/exit actions, documentation, example source, source links, and terminal recording. |
+| Missing claims manifest and tagged checks | Resolved by 16 manifest entries and clean-sandbox outcome tests. |
+| Plain-language first screen and headings | Resolved by the job headline, named audience, primary sample action, plain section headings, and `.factory/copy-audit.md`. |
+| Missing deliberate 404 | Resolved by `404.html`, response override, and live HTTP 404 verification. |
+| Metadata/shared skeleton gaps | Resolved on all real routes; sitemap includes `/demo/`. |
+| Small touch targets | Resolved; visible interactive areas are at least 44 px. |
+
+## Known gap and next step
+
+The external endpoint
+`https://api.sociobot.in/api/v1/products/code-path-lens/checkout` returned its
+documented error that the factory product is not enabled. No credentials or
+mock payment path were added. A factory operator must register/enable the
+product and supply its real return configuration. After that, restore the
+transparent $29 one-time paid UI, then verify checkout, a real return token,
+restore on a second device, valid unlock, and revoked-token recovery. Do not
+claim a paid tier before those external checks pass.

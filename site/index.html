@@ -3,70 +3,72 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Trace a bounded, source-linked path around one symbol. Local tree-sitter analysis for Rust, TypeScript, Python, and Go.">
+  <meta name="description" content="Trace callers, callees, types, and data boundaries around one code symbol without uploading your repository.">
   <meta name="theme-color" content="#111827">
-  <title>Code Path Lens — See the path, not the whole repository</title>
+  <link rel="canonical" href="https://code-path-lens.sociobot.in/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Code Path Lens — Trace bounded code paths">
+  <meta property="og:description" content="Trace callers, callees, types, and data boundaries around one code symbol without uploading your repository.">
+  <meta property="og:url" content="https://code-path-lens.sociobot.in/">
+  <meta property="og:image" content="https://code-path-lens.sociobot.in/assets/code-path-lens-card.webp">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Code Path Lens — Trace bounded code paths">
+  <meta name="twitter:description" content="Trace callers, callees, types, and data boundaries around one code symbol without uploading your repository.">
+  <meta name="twitter:image" content="https://code-path-lens.sociobot.in/assets/code-path-lens-card.webp">
+  <title>Code Path Lens — Trace bounded code paths</title>
   <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="stylesheet" href="/styles.css">
   <script type="module" src="/app.js"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to main content</a>
-  <div id="offline" class="offline-banner" role="status" hidden>You’re offline. The demo and docs still work; license verification will resume when connected.</div>
+  <div id="offline" class="offline-banner" role="status" hidden>You’re offline. Sample pages and docs still open.</div>
   <header class="site-header shell">
     <a class="brand" href="/" aria-label="Code Path Lens home"><span class="brand-mark">◉—</span> Code Path Lens</a>
-    <nav aria-label="Primary"><ul><li><a href="#demo">Demo</a></li><li><a href="#method">Method</a></li><li><a href="#pro">Pro</a></li><li><a class="button secondary" href="https://github.com/B-Divyesh/sf-code-path-lens">Source</a></li></ul></nav>
+    <nav aria-label="Primary"><ul><li><a href="/demo/">Demo</a></li><li><a href="/#how-it-works">How it works</a></li><li><a href="/privacy/">Privacy</a></li><li><a href="https://github.com/B-Divyesh/sf-code-path-lens">Source <span class="sr-only">(opens GitHub)</span></a></li></ul></nav>
   </header>
   <main id="main">
     <section class="hero shell" aria-labelledby="hero-title">
       <div class="hero-copy">
-        <p class="kicker">A field guide for unfamiliar code</p>
-        <h1 id="hero-title">See the path. Not the whole repository.</h1>
-        <p class="lede">Start at one symbol. Keep only the callers, callees, types, data boundaries, and source excerpts that earn a place in the review.</p>
-        <div class="hero-actions"><a class="button" href="#install">Install the CLI <span aria-hidden="true">↓</span></a><a class="button secondary" href="#demo">Inspect the live slice</a></div>
+        <h1 id="hero-title">Trace a bounded path around a code symbol</h1>
+        <p class="lede">For developers reviewing unfamiliar code, it shows callers, callees, types, and data boundaries without scanning the whole repository.</p>
+        <div class="hero-actions"><a class="button" href="/demo/">Try it with sample data</a><span class="action-note">Opens a populated Rust order path. Nothing is saved.</span></div>
       </div>
       <picture>
-        <img class="hero-art" src="/assets/hero-field-notebook.webp" width="1536" height="1024" fetchpriority="high" alt="A coral survey route crossing layered midnight paper and entering a blue doorway, representing a bounded path through source code">
+        <img class="hero-art" src="/assets/hero-field-notebook.webp" width="1536" height="1024" fetchpriority="high" alt="A coral survey route crossing layered midnight paper and entering a blue doorway, showing a bounded path through source code">
       </picture>
     </section>
-    <aside class="proof-strip"><ul class="proof-list shell"><li><strong>Local by construction</strong><span>Source never leaves your machine.</span></li><li><strong>Hard bounds</strong><span>Depth and node budgets stay explicit.</span></li><li><strong>Honest edges</strong><span>Unknown calls remain visibly unresolved.</span></li></ul></aside>
+    <aside class="proof-strip" aria-label="Code Path Lens facts"><ul class="proof-list shell"><li><strong>Local source analysis</strong><span>The free CLI reads your files on your machine.</span></li><li><strong>Offline sample page</strong><span>It reloads after your first visit.</span></li><li><strong>Free core outputs</strong><span>HTML, JSON, DOT, and evidence stay free.</span></li></ul></aside>
 
-    <section id="demo" class="section shell" aria-labelledby="demo-title">
-      <div class="section-heading"><div><p class="kicker">Recorded evidence / 01</p><h2 id="demo-title">A review slice you can interrogate.</h2></div><p>This live, keyboard-operable example begins at <code>handle_order</code>. Select a node to inspect the exact reason it belongs. The generated viewer works the same way and travels as one HTML file.</p></div>
-      <div class="demo-frame">
-        <div class="demo-bar"><code>shop · handle_order · depth 2</code><span>6 nodes / 6 edges</span></div>
-        <div class="demo-body">
-          <div class="demo-map">
-            <div class="demo-controls"><label for="demo-filter">Filter evidence<input id="demo-filter" type="search" placeholder="Function, type, boundary…" autocomplete="off"></label></div>
-            <ul class="node-key" aria-label="Node key"><li><span style="color:#a83220"></span>Entry</li><li><span style="color:#2866ae"></span>Function</li><li><span style="color:#2d5627"></span>Type</li><li><span style="color:#6a4600"></span>Boundary</li><li><span style="color:#8c2c3a"></span>Unresolved</li></ul>
-            <div id="demo-map" class="map-scene" aria-label="Example code path"></div>
-            <p id="demo-empty" hidden>No evidence matches. Clear the filter to restore the route.</p>
-          </div>
-          <aside class="demo-evidence" aria-live="polite"><p class="kicker">Selected evidence</p><h3 id="demo-evidence-title">handle_order</h3><p id="demo-evidence-meta">Rust · src/orders.rs:18 · entry</p><p id="demo-evidence-reason">Requested entry symbol.</p><a id="demo-evidence-link" href="https://github.com/B-Divyesh/sf-code-path-lens">Open source location</a><pre id="demo-evidence-source">18 │ fn handle_order(order: Order) {
-19 │     validate(&amp;order)?;
-20 │     repository.insert(order)?;
-21 │     emit_receipt(order.id);
-22 │ }</pre></aside>
-        </div>
+    <section class="section shell" aria-labelledby="preview-title">
+      <div class="section-heading"><div><h2 id="preview-title">Sample review path</h2></div><p>The sample starts at <code>handle_order</code>. It keeps the exact file, line, and reason for every included node.</p></div>
+      <div class="demo-frame preview-frame">
+        <div class="demo-bar"><code>checkout-sample · handle_order · depth 2</code><span>Static evidence</span></div>
+        <div class="preview-map" aria-label="Sample code path preview"><span class="preview-node entry">handle_order</span><span class="preview-line">calls</span><span class="preview-node">validate</span><span class="preview-line">uses</span><span class="preview-node type">Order</span><span class="preview-line">crosses</span><span class="preview-node boundary">database I/O</span><span class="preview-line">keeps</span><span class="preview-node unresolved">emit_receipt</span></div>
+        <p class="preview-link"><a href="/demo/">Open the sample path and inspect its source evidence</a></p>
       </div>
     </section>
 
-    <section id="method" class="section shell" aria-labelledby="method-title">
-      <div class="section-heading"><div><p class="kicker">The method / 02</p><h2 id="method-title">Evidence before explanation.</h2></div><p>Code Path Lens does not answer questions about your code. It assembles the small, reproducible body of evidence you need to answer them yourself.</p></div>
-      <div class="steps"><article class="step"><h3>Parse locally</h3><p>Tree-sitter adapters index declarations and calls in Rust, TypeScript/JavaScript, Python, and Go while respecting <code>.gitignore</code> and generated-code markers.</p></article><article class="step"><h3>Cut to a bound</h3><p>A bidirectional walk follows callees and callers only as far as your depth and node budgets allow. The output says when it was truncated.</p></article><article class="step"><h3>Carry the proof</h3><p>HTML, JSON, and DOT outputs preserve file, line, excerpt, edge kind, and resolution status. Share the slice, not the repository.</p></article></div>
+    <section id="how-it-works" class="section shell" aria-labelledby="method-title">
+      <div class="section-heading"><div><h2 id="method-title">How Code Path Lens works</h2></div><p>It builds a small review slice from parsed local source. It does not claim to reproduce runtime behavior.</p></div>
+      <ol class="steps"><li class="step"><h3>Choose a symbol</h3><p>Start with the function or method under review.</p></li><li class="step"><h3>Set a bound</h3><p>Keep caller and callee steps within a stated depth and node limit.</p></li><li class="step"><h3>Open the evidence</h3><p>Review source excerpts, links, types, boundaries, and unresolved calls.</p></li></ol>
     </section>
 
     <section id="install" class="section shell" aria-labelledby="install-title">
-      <div class="section-heading"><div><p class="kicker">One binary / 03</p><h2 id="install-title">Point it at a symbol.</h2></div><p>No daemon, account, cloud index, or language server required. Build from source now; release binaries are attached by the factory after publishing.</p></div>
-      <div class="command"><code id="install-command">cargo install --git https://github.com/B-Divyesh/sf-code-path-lens</code><button id="copy-command" class="copy-command" type="button">Copy</button></div>
-      <div class="command"><code>code-path-lens trace handle_order --root ./shop --output order-lens.html</code></div>
+      <div class="section-heading"><div><h2 id="install-title">Run the CLI on a local repository</h2></div><p>Use the bundled demo first, then trace a symbol in a Rust, TypeScript, JavaScript, Python, or Go repository.</p></div>
+      <div class="command"><code id="install-command">cargo install --path .</code><button id="copy-command" class="copy-command" type="button">Copy command</button></div>
+      <div class="command"><code>code-path-lens demo</code></div>
+      <figure class="terminal-recording"><img src="/demo-terminal.svg" width="960" height="330" alt="Terminal recording of the bundled code-path-lens demo writing a review page for handle_order"><figcaption>The bundled command writes a populated local review page. The same sample is available in <a href="/demo/">the browser demo</a>.</figcaption></figure>
     </section>
 
-    <section id="pro" class="section shell" aria-labelledby="pro-title">
-      <div class="price-layout"><div><p class="kicker">Pro field kit / 04</p><h2 id="pro-title">Wider bounds, once.</h2><p class="price">$29 <small>one-time purchase</small></p><p class="lede">Free includes every format and the complete evidence model at depth 2 / 40 nodes. Pro raises the cap to depth 8 / 250 nodes. Accessibility, export, and privacy are never gated.</p><ul class="feature-list"><li>One-time license, usable on your own devices</li><li>No subscription and no source upload</li><li>Sociobot/Dodo is merchant of record</li><li>Refunds are handled by the merchant and revoke the license</li></ul><a class="button" href="__CODE_PATH_LENS_BILLING_BASE__/products/code-path-lens/checkout">Buy Code Path Lens Pro</a></div>
-      <div class="license-box"><h3>Restore a purchase</h3><p>Paste the token from your receipt or checkout return. It is stored only in this browser. The CLI can read the same token from <code>CODE_PATH_LENS_LICENSE</code>.</p><form id="license-form" class="license-form"><label class="field-label" for="license-token">License token<input id="license-token" name="license" type="text" autocomplete="off" spellcheck="false" required aria-describedby="license-note"></label><button class="button" type="submit">Verify license</button><p id="license-note" class="license-note" role="status">No license stored.</p></form><p><a href="/privacy/">Privacy</a> · <a href="/terms/">Terms</a></p></div></div>
+    <section class="section shell" aria-labelledby="limits-title">
+      <div class="section-heading"><div><h2 id="limits-title">What the analysis does not do</h2></div><p>It is bounded static analysis. Dynamic dispatch, reflection, generated code, and runtime configuration can change the actual path.</p></div>
+      <p class="privacy-copy">The free CLI has no account, cloud index, telemetry, or source upload. It respects <code>.gitignore</code> and skips common generated and vendor directories by default.</p>
     </section>
   </main>
-  <footer class="site-footer"><div class="footer-row shell"><p>Code Path Lens 0.1.0 · MIT · No telemetry.</p><div class="footer-links"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="https://github.com/B-Divyesh/sf-code-path-lens">GitHub</a></div></div></footer>
+  <footer class="site-footer"><div class="footer-row shell"><p>Code Path Lens 0.1.0 · Built by Param Factory</p><div class="footer-links"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="https://github.com/B-Divyesh/sf-code-path-lens">GitHub <span class="sr-only">(opens GitHub)</span></a></div></div></footer>
 </body>
 </html>

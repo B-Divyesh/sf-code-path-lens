@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Inspect a populated Code Path Lens sample path without saving anything to your data.">
+  <meta name="theme-color" content="#111827">
+  <link rel="canonical" href="https://code-path-lens.sociobot.in/demo/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Demo — Code Path Lens">
+  <meta property="og:description" content="Inspect a populated code path sample without saving anything to your data.">
+  <meta property="og:url" content="https://code-path-lens.sociobot.in/demo/">
+  <meta property="og:image" content="https://code-path-lens.sociobot.in/assets/code-path-lens-card.webp">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Demo — Code Path Lens">
+  <meta name="twitter:description" content="Inspect a populated code path sample without saving anything to your data.">
+  <meta name="twitter:image" content="https://code-path-lens.sociobot.in/assets/code-path-lens-card.webp">
+  <title>Demo — Code Path Lens</title>
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body data-demo="true">
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <div id="offline" class="offline-banner" role="status" hidden>You’re offline. This saved sample still opens.</div>
+  <header class="site-header shell">
+    <a class="brand" href="/" aria-label="Code Path Lens home"><span class="brand-mark">◉—</span> Code Path Lens</a>
+    <nav aria-label="Primary"><ul><li><a href="/demo/" aria-current="page">Demo</a></li><li><a href="/#how-it-works">How it works</a></li><li><a href="/privacy/">Privacy</a></li><li><a href="https://github.com/B-Divyesh/sf-code-path-lens">Source <span class="sr-only">(opens GitHub)</span></a></li></ul></nav>
+  </header>
+  <main id="main" class="demo-page shell">
+    <aside class="sample-banner" aria-label="Sample mode"><strong>Demo — sample data, nothing is saved</strong><div><button id="reset-demo" type="button">Reset demo</button><a href="/" class="banner-link">Start for real</a></div></aside>
+    <section class="demo-intro" aria-labelledby="demo-title">
+      <h1 id="demo-title">Inspect a sample code path</h1>
+      <p>Start with a populated Rust order handler. Select any node to see its source, line, and reason.</p>
+    </section>
+    <section class="demo-frame" aria-labelledby="demo-map-title">
+      <div class="demo-bar"><code id="demo-map-title">checkout-sample · handle_order · depth 2</code><span id="demo-count">7 nodes / 6 edge types</span></div>
+      <div class="demo-body">
+        <div class="demo-map">
+          <div class="demo-controls"><label for="demo-filter">Filter evidence<input id="demo-filter" type="search" placeholder="Function, type, boundary" autocomplete="off"></label></div>
+          <ul class="node-key" aria-label="Node key"><li><span class="key-entry"></span>Entry</li><li><span class="key-function"></span>Function</li><li><span class="key-type"></span>Type</li><li><span class="key-boundary"></span>Boundary</li><li><span class="key-unresolved"></span>Unresolved</li></ul>
+          <div id="demo-map" class="map-scene" aria-label="Example code path"></div>
+          <p id="demo-empty" hidden>No evidence matches. Clear the filter to restore the route.</p>
+          <div class="demo-edge-list"><h2>Sample edge list</h2><ul><li><code>post_order</code> calls <code>handle_order</code></li><li><code>handle_order</code> calls <code>validate</code></li><li><code>handle_order</code> uses type <code>Order</code></li><li><code>handle_order</code> crosses database I/O</li><li><code>handle_order</code> has unresolved call <code>emit_receipt</code></li></ul></div>
+        </div>
+        <aside class="demo-evidence" aria-live="polite"><p class="eyebrow">Selected evidence</p><h2 id="demo-evidence-title">handle_order</h2><p id="demo-evidence-meta">Rust · examples/checkout-sample/src/orders.rs:7 · entry</p><p id="demo-evidence-reason">Requested entry symbol.</p><a id="demo-evidence-link" href="https://github.com/B-Divyesh/sf-code-path-lens/blob/main/examples/checkout-sample/src/orders.rs#L7-L11">Open source location <span class="sr-only">on GitHub</span></a><pre id="demo-evidence-source" tabindex="0">7 │ pub fn handle_order(order: Order) {
+8 │     validate(&amp;order);
+9 │     database_insert(order);
+10 │     emit_receipt();
+11 │ }</pre></aside>
+      </div>
+    </section>
+    <section class="demo-help" aria-labelledby="demo-help-title"><h2 id="demo-help-title">Try the same sample in the CLI</h2><p>Install the CLI, then run <code>code-path-lens demo</code>. It creates a temporary sample repository and prints the output path.</p></section>
+  </main>
+  <footer class="site-footer"><div class="footer-row shell"><p>Code Path Lens 0.1.0 · Built by Param Factory</p><div class="footer-links"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="https://github.com/B-Divyesh/sf-code-path-lens">GitHub <span class="sr-only">(opens GitHub)</span></a></div></div></footer>
+</body>
+</html>

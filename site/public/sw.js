@@ -1,5 +1,5 @@
-const CACHE = 'code-path-lens-shell-v1';
-const SHELL = ['/', '/privacy/', '/terms/'];
+const CACHE = 'code-path-lens-shell-v2';
+const SHELL = ['/', '/demo/', '/privacy/', '/terms/', '/404.html'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(SHELL)));

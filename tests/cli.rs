@@ -35,3 +35,24 @@ fn documented_html_and_json_commands_work_end_to_end() {
     assert_eq!(graph["symbol"], "handle_order");
     assert!(graph["nodes"].as_array().unwrap().len() >= 2);
 }
+
+#[test]
+fn bundled_demo_runs_without_a_repository_and_reports_its_output() {
+    let directory = tempdir().unwrap();
+    let output = directory.path().join("sample-lens.html");
+    let result = Command::new(env!("CARGO_BIN_EXE_code-path-lens"))
+        .args(["demo", "--output"])
+        .arg(&output)
+        .output()
+        .unwrap();
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+    assert!(String::from_utf8_lossy(&result.stderr).contains("Bundled sample repository:"));
+    let html = fs::read_to_string(output).unwrap();
+    assert!(html.contains("handle_order"));
+    assert!(html.contains("database I/O"));
+    assert!(html.contains("emit_receipt"));
+}

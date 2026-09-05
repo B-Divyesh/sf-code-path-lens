@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="330" viewBox="0 0 960 330" role="img" aria-labelledby="title desc">
+  <title id="title">Code Path Lens bundled demo terminal recording</title>
+  <desc id="desc">A terminal runs code-path-lens demo and reports a populated HTML review page for handle_order.</desc>
+  <rect width="960" height="330" fill="#090f1d"/>
+  <rect x="1" y="1" width="958" height="328" fill="none" stroke="#52617c" stroke-width="2"/>
+  <circle cx="30" cy="28" r="7" fill="#ee765e"/><circle cx="54" cy="28" r="7" fill="#e5b85c"/><circle cx="78" cy="28" r="7" fill="#9bcb89"/>
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="19">
+    <text x="32" y="82" fill="#f7f0de">$ code-path-lens demo</text>
+    <text x="32" y="126" fill="#aab2c0">Bundled sample repository: /tmp/code-path-lens-demo-…</text>
+    <text x="32" y="170" fill="#9bcb89">Wrote 7 nodes and 7 edges to</text>
+    <text x="32" y="202" fill="#9bcb89">…/handle_order-lens.html</text>
+    <text x="32" y="246" fill="#aab2c0">warning: Static approximation: dynamic dispatch and</text>
+    <text x="32" y="278" fill="#aab2c0">runtime configuration may change the executed path.</text>
+  </g>
+</svg>

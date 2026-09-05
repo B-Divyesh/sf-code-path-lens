@@ -74,4 +74,8 @@ this product using `/opt/fleet/lib/gen-image.sh`, then cropped/converted to WebP
 and held under 300 KB. Prompt and generator invocation are recorded in the
 handoff and adjacent asset metadata. License: original commissioned output for
 this product, used under the generator service terms. Interface marks, graph
-lines, and icons are hand-authored CSS/SVG in the repository.
+lines, and icons are hand-authored CSS/SVG in the repository. The 1200×630
+social card is a crop of that same commissioned hero plate, and the 180 px
+touch icon is its square crop. `demo-terminal.svg` is a hand-authored terminal
+recording illustration of the shipped `code-path-lens demo` command. No asset
+uses a third-party logo, font, or stock image.

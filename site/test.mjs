@@ -1,33 +1,47 @@
 import { readFile, stat } from 'node:fs/promises';
 
-const productionBillingBase = 'https://api.sociobot.in/api/v1';
+const pages = [
+  ['dist/site/index.html', 'Code Path Lens — Trace bounded code paths'],
+  ['dist/site/demo/index.html', 'Demo — Code Path Lens'],
+  ['dist/site/privacy/index.html', 'Privacy — Code Path Lens'],
+  ['dist/site/terms/index.html', 'Terms — Code Path Lens'],
+  ['dist/site/404.html', 'Page not found — Code Path Lens']
+];
 
-const pages = ['dist/site/index.html', 'dist/site/privacy/index.html', 'dist/site/terms/index.html'];
-for (const page of pages) {
-  const html = await readFile(page, 'utf8');
-  if (!html.includes('<html lang="en"')) throw new Error(`${page}: missing lang`);
-  if (!html.includes('<title>')) throw new Error(`${page}: missing title`);
-  if (!html.includes('<main')) throw new Error(`${page}: missing main`);
-  if ((html.match(/<h1[ >]/g) || []).length !== 1) throw new Error(`${page}: expected one h1`);
+for (const [path, title] of pages) {
+  const html = await readFile(path, 'utf8');
+  if (!html.includes('<html lang="en"')) throw new Error(`${path}: missing language`);
+  if (!html.includes(`<title>${title}</title>`)) throw new Error(`${path}: unexpected route title`);
+  if (!html.includes('<main')) throw new Error(`${path}: missing main landmark`);
+  if ((html.match(/<h1[ >]/g) || []).length !== 1) throw new Error(`${path}: expected one h1`);
+  if (!html.includes('rel="canonical"')) throw new Error(`${path}: missing canonical URL`);
+  if (!html.includes('property="og:image"') || !html.includes('name="twitter:card"')) throw new Error(`${path}: missing share metadata`);
+  if (!html.includes('Built by Param Factory')) throw new Error(`${path}: missing shared footer`);
   for (const image of html.matchAll(/<img\b[^>]*>/g)) {
-    if (!/\balt=/.test(image[0])) throw new Error(`${page}: image without alt`);
+    if (!/\balt=/.test(image[0])) throw new Error(`${path}: image without alt text`);
   }
 }
+
 const entry = await readFile('dist/site/index.html', 'utf8');
-if (!entry.includes('/privacy/') || !entry.includes('/terms/')) throw new Error('legal links missing');
-if (!entry.includes(`${productionBillingBase}/products/code-path-lens/checkout`)) throw new Error('production checkout link missing');
-const script = entry.match(/<script[^>]+src="([^"]+)"/i)?.[1];
-if (!script) throw new Error('application script missing');
-const application = await readFile(`dist/site${script}`, 'utf8');
-if (!application.includes(productionBillingBase) || !application.includes('/products/code-path-lens/verify')) throw new Error('production license verification endpoint missing');
-const releaseFiles = [entry, application];
-if (releaseFiles.some((content) => content.includes('pilot-api.sociobot.in'))) throw new Error('pilot billing endpoint shipped in release output');
-if (releaseFiles.some((content) => content.includes('__CODE_PATH_LENS_BILLING_BASE__'))) throw new Error('billing endpoint placeholder shipped in release output');
+if (!entry.includes('Try it with sample data')) throw new Error('landing page has no sample action');
+if (!entry.includes('/demo/')) throw new Error('landing page has no demo route');
+const demo = await readFile('dist/site/demo/index.html', 'utf8');
+for (const value of ['Demo — sample data, nothing is saved', 'Reset demo', 'Start for real']) {
+  if (!demo.includes(value)) throw new Error(`demo page is missing ${value}`);
+}
+
 const deploymentConfig = JSON.parse(await readFile('dist/site/staticwebapp.config.json', 'utf8'));
-if (deploymentConfig.globalHeaders?.['Content-Security-Policy'] !== "default-src 'self'; base-uri 'self'; connect-src 'self' https://api.sociobot.in; form-action 'self'; frame-ancestors 'none'; img-src 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; worker-src 'self'") throw new Error('deployment CSP is missing or unexpectedly broad');
-if (deploymentConfig.globalHeaders?.['X-Frame-Options'] !== 'DENY') throw new Error('deployment frame policy missing');
+if (deploymentConfig.navigationFallback) throw new Error('multipage site must not rewrite missing URLs to the landing page');
+if (deploymentConfig.responseOverrides?.['404']?.statusCode !== 404) throw new Error('404 response override is missing');
+if (deploymentConfig.responseOverrides?.['404']?.rewrite !== '/404.html') throw new Error('404 document is missing');
+if (!deploymentConfig.routes?.some((route) => route.route === '/demo' && route.rewrite === '/demo/index.html')) throw new Error('direct /demo route is missing');
+if (!deploymentConfig.globalHeaders?.['Content-Security-Policy']?.includes("connect-src 'self'")) throw new Error('CSP does not limit connections to this site');
 const assetRoute = deploymentConfig.routes?.find((route) => route.route === '/assets/*');
-if (assetRoute?.headers?.['Cache-Control'] !== 'public, max-age=31536000, immutable') throw new Error('hashed asset immutable cache policy missing');
+if (assetRoute?.headers?.['Cache-Control'] !== 'public, max-age=31536000, immutable') throw new Error('hashed asset cache policy missing');
+
 const hero = await stat('dist/site/assets/hero-field-notebook.webp');
+const shareCard = await stat('dist/site/assets/code-path-lens-card.webp');
+const touchIcon = await stat('dist/site/apple-touch-icon.png');
 if (hero.size > 300_000) throw new Error(`hero is ${hero.size} bytes; budget is 300000`);
+if (shareCard.size === 0 || touchIcon.size === 0) throw new Error('share or touch image is empty');
 console.log(`site checks passed; hero ${(hero.size / 1024).toFixed(1)} KB`);

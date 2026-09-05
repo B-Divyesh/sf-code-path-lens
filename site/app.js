@@ -1,39 +1,88 @@
 const demoNodes = [
-  { id: 'handle', label: 'handle_order', kind: 'entry', meta: 'Rust · src/orders.rs:18 · entry', reason: 'Requested entry symbol.', source: '18 │ fn handle_order(order: Order) {\n19 │     validate(&order)?;\n20 │     repository.insert(order)?;\n21 │     emit_receipt(order.id);\n22 │ }' },
-  { id: 'validate', label: 'validate', kind: 'function', meta: 'Rust · src/orders.rs:31 · function', reason: 'Call expression at src/orders.rs:19.', source: '31 │ fn validate(order: &Order) -> Result<()> {\n32 │     ensure!(!order.items.is_empty());\n33 │     Ok(())\n34 │ }' },
-  { id: 'caller', label: 'post_order', kind: 'function', meta: 'Rust · src/http.rs:44 · caller', reason: 'post_order calls handle_order at src/http.rs:48.', source: '44 │ async fn post_order(body: Json<Order>) {\n45 │     handle_order(body.0)\n46 │ }' },
-  { id: 'order', label: 'Order', kind: 'type', meta: 'Rust · src/model.rs:7 · type', reason: 'Order appears in handle_order’s declaration.', source: ' 7 │ struct Order {\n 8 │     id: OrderId,\n 9 │     items: Vec<LineItem>,\n10 │ }' },
-  { id: 'database', label: 'database I/O', kind: 'boundary', meta: 'src/orders.rs:20 · data boundary', reason: 'Call “insert” matched the database I/O boundary rule.', source: '' },
-  { id: 'receipt', label: 'emit_receipt', kind: 'unresolved', meta: 'src/orders.rs:21 · unresolved call', reason: 'No matching declaration in scanned files. Kept visible rather than guessed.', source: '' }
+  {
+    id: 'handle', label: 'handle_order', kind: 'entry',
+    meta: 'Rust · examples/checkout-sample/src/orders.rs:7 · entry',
+    reason: 'Requested entry symbol.',
+    link: 'https://github.com/B-Divyesh/sf-code-path-lens/blob/main/examples/checkout-sample/src/orders.rs#L7-L11',
+    source: '7 │ pub fn handle_order(order: Order) {\n8 │     validate(&order);\n9 │     database_insert(order);\n10 │     emit_receipt();\n11 │ }'
+  },
+  {
+    id: 'validate', label: 'validate', kind: 'function',
+    meta: 'Rust · examples/checkout-sample/src/orders.rs:5 · function',
+    reason: 'Call expression at examples/checkout-sample/src/orders.rs:8.',
+    link: 'https://github.com/B-Divyesh/sf-code-path-lens/blob/main/examples/checkout-sample/src/orders.rs#L5',
+    source: '5 │ pub fn validate(_order: &Order) {}'
+  },
+  {
+    id: 'caller', label: 'post_order', kind: 'function',
+    meta: 'Rust · examples/checkout-sample/src/http.rs:4 · caller',
+    reason: 'post_order calls handle_order at examples/checkout-sample/src/http.rs:5.',
+    link: 'https://github.com/B-Divyesh/sf-code-path-lens/blob/main/examples/checkout-sample/src/http.rs#L4-L6',
+    source: '4 │ pub fn post_order(order: Order) {\n5 │     handle_order(order)\n6 │ }'
+  },
+  {
+    id: 'order', label: 'Order', kind: 'type',
+    meta: 'Rust · examples/checkout-sample/src/model.rs:1 · type',
+    reason: 'Order appears in handle_order’s declaration.',
+    link: 'https://github.com/B-Divyesh/sf-code-path-lens/blob/main/examples/checkout-sample/src/model.rs#L1-L4',
+    source: '1 │ pub struct Order {\n2 │     pub id: String,\n3 │     pub items: Vec<String>,\n4 │ }'
+  },
+  {
+    id: 'insert', label: 'database_insert', kind: 'function',
+    meta: 'Rust · examples/checkout-sample/src/orders.rs:3 · function',
+    reason: 'Call expression at examples/checkout-sample/src/orders.rs:9.',
+    link: 'https://github.com/B-Divyesh/sf-code-path-lens/blob/main/examples/checkout-sample/src/orders.rs#L3',
+    source: '3 │ pub fn database_insert(_order: Order) {}'
+  },
+  {
+    id: 'database', label: 'database I/O', kind: 'boundary',
+    meta: 'examples/checkout-sample/src/orders.rs:9 · data boundary',
+    reason: 'Call “database_insert” matched the database I/O boundary rule.',
+    link: 'https://github.com/B-Divyesh/sf-code-path-lens/blob/main/examples/checkout-sample/src/orders.rs#L9',
+    source: ''
+  },
+  {
+    id: 'receipt', label: 'emit_receipt', kind: 'unresolved',
+    meta: 'examples/checkout-sample/src/orders.rs:10 · unresolved call',
+    reason: 'No matching declaration in scanned files. Kept visible rather than guessed.',
+    link: 'https://github.com/B-Divyesh/sf-code-path-lens/blob/main/examples/checkout-sample/src/orders.rs#L10',
+    source: ''
+  }
 ];
 
 const map = document.querySelector('#demo-map');
 if (map) {
+  const title = document.querySelector('#demo-evidence-title');
+  const meta = document.querySelector('#demo-evidence-meta');
+  const reason = document.querySelector('#demo-evidence-reason');
+  const source = document.querySelector('#demo-evidence-source');
+  const sourceLink = document.querySelector('#demo-evidence-link');
   const buttons = demoNodes.map((node) => {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'demo-node';
     button.dataset.kind = node.kind;
     button.setAttribute('aria-pressed', 'false');
-    const title = document.createElement('strong');
+    const label = document.createElement('strong');
     const detail = document.createElement('small');
-    title.textContent = node.label;
+    label.textContent = node.label;
     detail.textContent = node.kind.replace('_', ' ');
-    button.append(title, detail);
+    button.append(label, detail);
     const select = () => {
       buttons.forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
-      document.querySelector('#demo-evidence-title').textContent = node.label;
-      document.querySelector('#demo-evidence-meta').textContent = node.meta;
-      document.querySelector('#demo-evidence-reason').textContent = node.reason;
-      const source = document.querySelector('#demo-evidence-source');
+      title.textContent = node.label;
+      meta.textContent = node.meta;
+      reason.textContent = node.reason;
       source.hidden = !node.source;
       source.textContent = node.source;
+      sourceLink.href = node.link;
     };
     button.addEventListener('click', select);
     button.addEventListener('keydown', (event) => {
       if (!['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp'].includes(event.key)) return;
       event.preventDefault();
       const visible = buttons.filter((item) => !item.hidden);
+      if (!visible.length) return;
       const step = ['ArrowRight', 'ArrowDown'].includes(event.key) ? 1 : -1;
       visible[(visible.indexOf(button) + step + visible.length) % visible.length]?.focus();
     });
@@ -65,6 +114,22 @@ if (map) {
       filter.blur();
     }
   });
+
+  document.querySelector('#reset-demo')?.addEventListener('click', () => {
+    localStorage.removeItem('demo:code-path-lens:session');
+    localStorage.setItem('demo:code-path-lens:session', 'active');
+    filter.value = '';
+    applyFilter();
+    buttons[0].click();
+    filter.focus();
+  });
+}
+
+if (document.body.dataset.demo === 'true') {
+  localStorage.setItem('demo:code-path-lens:session', 'active');
+  document.querySelector('.banner-link')?.addEventListener('click', () => {
+    localStorage.removeItem('demo:code-path-lens:session');
+  });
 }
 
 const copyButton = document.querySelector('#copy-command');
@@ -74,87 +139,14 @@ copyButton?.addEventListener('click', async () => {
     await navigator.clipboard.writeText(command);
     copyButton.textContent = 'Copied';
   } catch {
-    copyButton.textContent = 'Select text';
+    copyButton.textContent = 'Select command';
     const selection = window.getSelection();
     const range = document.createRange();
     range.selectNodeContents(document.querySelector('#install-command'));
     selection.removeAllRanges();
     selection.addRange(range);
   }
-  setTimeout(() => { copyButton.textContent = 'Copy'; }, 1800);
-});
-
-const LICENSE_KEY = 'sb_license:code-path-lens';
-const VERDICT_KEY = `${LICENSE_KEY}:verdict`;
-// Replaced by Vite as a string at build time. Keeping the released endpoint in
-// the build config makes the checkout link and token verification use one
-// audited production source of truth.
-const API = __CODE_PATH_LENS_BILLING_BASE__;
-const licenseNote = document.querySelector('#license-note');
-const tokenInput = document.querySelector('#license-token');
-
-function setLicenseState(message, state = '') {
-  if (!licenseNote) return;
-  licenseNote.textContent = message;
-  licenseNote.dataset.state = state;
-}
-
-async function verifyLicense(token, force = false) {
-  let cached = null;
-  try {
-    cached = JSON.parse(localStorage.getItem(VERDICT_KEY) || 'null');
-  } catch {
-    localStorage.removeItem(VERDICT_KEY);
-  }
-  const fresh = cached && cached.token === token && Date.now() - cached.checkedAt < 86_400_000;
-  if (!force && fresh) {
-    setLicenseState(cached.valid ? 'Pro is unlocked on this browser.' : 'This license is no longer active.', cached.valid ? 'success' : 'error');
-    return cached.valid;
-  }
-  if (!navigator.onLine) {
-    if (cached?.valid && cached.token === token) setLicenseState('Pro is unlocked from the last verified license. Verification will resume online.', 'success');
-    else setLicenseState('You’re offline. The free experience still works; reconnect to verify this license.');
-    return Boolean(cached?.valid && cached.token === token);
-  }
-  setLicenseState('Checking the license…');
-  try {
-    const response = await fetch(`${API}/products/code-path-lens/verify?license=${encodeURIComponent(token)}`, { headers: { accept: 'application/json' } });
-    if (!response.ok) throw new Error(`Verification returned ${response.status}`);
-    const result = await response.json();
-    const verdict = { token, valid: result.valid === true, checkedAt: Date.now() };
-    localStorage.setItem(VERDICT_KEY, JSON.stringify(verdict));
-    setLicenseState(verdict.valid ? 'Pro is unlocked on this browser.' : 'This license is no longer active. You can purchase a new license below.', verdict.valid ? 'success' : 'error');
-    return verdict.valid;
-  } catch {
-    setLicenseState('License verification could not connect. The free experience still works; try again when online.', 'error');
-    return false;
-  }
-}
-
-const query = new URLSearchParams(location.search);
-const returnedLicense = query.get('license');
-if (returnedLicense) {
-  localStorage.setItem(LICENSE_KEY, returnedLicense);
-  query.delete('license');
-  const clean = `${location.pathname}${query.size ? `?${query}` : ''}${location.hash}`;
-  history.replaceState({}, '', clean);
-}
-const storedLicense = returnedLicense || localStorage.getItem(LICENSE_KEY);
-if (storedLicense && tokenInput) {
-  tokenInput.value = storedLicense;
-  verifyLicense(storedLicense);
-}
-
-document.querySelector('#license-form')?.addEventListener('submit', async (event) => {
-  event.preventDefault();
-  const token = tokenInput.value.trim();
-  if (!token) {
-    setLicenseState('Paste the license token from your receipt.', 'error');
-    tokenInput.focus();
-    return;
-  }
-  localStorage.setItem(LICENSE_KEY, token);
-  await verifyLicense(token, true);
+  setTimeout(() => { copyButton.textContent = 'Copy command'; }, 1800);
 });
 
 function updateOffline() {
